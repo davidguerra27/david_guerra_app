@@ -1,6 +1,7 @@
 import React from "react";
-import { useEffect , useState } from "react";
+import { useState } from "react";
 import UserCard from './UserCard'
+import RepoCard from './RepoCard'
 import './App.css';
 import SearchIcon from './search.svg';
 
@@ -10,8 +11,9 @@ import SearchIcon from './search.svg';
 const API_URL = 'https://api.github.com/users/';
 
 const App = () =>{
-
+    const [searchTerm, setSearchTerm] = useState("");
     const [users,setUsers] = useState([]);
+    const [repos,setRepos] = useState([]);
 
     const searchUsers = async (username) => {
         const response = await fetch(`${API_URL}${username}`);
@@ -20,41 +22,47 @@ const App = () =>{
         setUsers([data])
         console.log(users);
     }
-    
+    const searchRepositories = async (username) => {
+        const response = await fetch(`https://api.github.com/users/${username}/repos`);
 
-    useEffect(()=>{
-        searchUsers('4ian');
+
+        const data = await response.json();
+        setRepos(data)
+        console.log(data)
         
-    },[]);
-    console.log(users +"entrei")
+    }
+
+   
     return (
         <div className="app">
             <h1>GitHub Browser</h1>
             <div className="search">
                 <input
                     placeholder="Search for GitHub Users"
-                    value="davidguerra27"
-                    onChange={()=>{}}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 <img 
                     src={SearchIcon}
                     alt="search"
-                    onClick={()=>{}}
+                    onClick={()=>searchUsers(searchTerm)}
                 />
             </div> 
 
             
                 
-                <div className="container">
+                <div className="container" onClick={()=> searchRepositories(searchTerm)}>
                     {users.map((user) => (
                         <UserCard user={user}/>
                     ) )} 
                 </div>
                 
-              
-           
-
-           
+                <div className="container">
+                    {repos.map((repo) => (
+                        <RepoCard repo={repo}/>
+                    ) )} 
+                </div>
+   
         </div>
     );
 }
